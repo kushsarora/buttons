@@ -1,0 +1,233 @@
+/* RESET */
+*,
+*::before,
+*::after { box-sizing: border-box; }  /* prevents navbar overflow */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #111;
+  overflow-x: hidden;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;                 /* with border-box, padding no longer overflows */
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  z-index: 1000;
+}
+
+.navbar-logo { font-size: 1.25rem; font-weight: bold; }
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: nowrap;           /* prevent wrapping that can cause odd clipping */
+}
+
+.navbar-links li { display: flex; align-items: center; }
+
+.navbar-links a {
+  text-decoration: none;
+  color: #111;
+  font-size: 0.95rem;
+}
+
+.navbar-links a:hover { color: #ff24ed; }
+
+/* Nav signup button (as <a>) */
+.signup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff24ed;
+  color: #fff !important;
+  padding: 8px 16px;           /* a bit more breathing room */
+  border-radius: 10px;         /* less pill, matches hero buttons */
+  line-height: 1;              /* keeps it from looking squished */
+  border: 0;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.signup-btn:hover {
+  background: #2ffa2f;
+  color: #111 !important;
+}
+
+/* HERO */
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  overflow: hidden;
+  /* offset content for fixed navbar height (~56px) */
+  margin-top: 56px;
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  filter: blur(200px);
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.hero::before {
+  top: -300px;
+  left: -300px;
+  background: radial-gradient(circle at top left, rgba(255,36,237,0.6));
+}
+
+.hero::after {
+  top: -300px;
+  right: -300px;
+  background: radial-gradient(circle at top right, rgba(47,250,47,0.5));
+}
+
+.hero-content { max-width: 800px; position: relative; z-index: 2; }
+.hero-badge {
+  background: rgba(255,36,237,0.1);
+  color: #ff24ed;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.hero h1 { font-size: 3rem; font-weight: 800; color: #111; margin-top: 15px; }
+.hero h1 .highlight { color: #2ffa2f; }
+.hero p { font-size: 1.2rem; color: #444; margin: 20px 0; }
+.hero-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+
+.btn {
+  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+}
+
+.btn-pink { background: #ff24ed; color: #fff; }
+.btn-pink:hover { background: #2ffa2f; color: #111; }
+
+.btn-green { background: #2ffa2f; color: #111; }
+.btn-green:hover { background: #ff24ed; color: #fff; }
+
+/* LOGOS */
+.logos {
+  text-align: center;
+  padding: 100px 20px;
+  background: rgba(47, 250, 47, 0.05);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  z-index: 1;
+}
+
+.logos-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.logos-container {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  flex-wrap: wrap;
+}
+
+.logos-container img {
+  height: 40px;
+  opacity: 0.9;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logos-container img:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* CONTENT SECTIONS */
+.content-section { padding: 120px 20px; }
+.content-green { background: #fff; }                 /* fix invalid rgba(white) */
+.content-pink  { background: rgba(255, 36, 237, 0.05); }
+
+.content-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.content-container.reverse { flex-direction: row-reverse; }
+
+.content-text { flex: 1; }
+.content-text h2 { font-size: 2.5rem; margin-bottom: 20px; color: #111; }
+.content-text p { font-size: 1.15rem; line-height: 1.6; color: #444; }
+
+.content-image { flex: 1; display: flex; justify-content: center; }
+.content-image img {
+  max-width: 90%;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+.content-image img:hover { transform: scale(1.03); }
+
+/* TESTIMONIALS */
+.testimonials { padding: 120px 20px; background: #fff; text-align: center; }
+.testimonials h2 { font-size: 2.2rem; margin-bottom: 50px; color: #111; }
+.testimonial-cards { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+.testimonial-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 320px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  text-align: left;
+  transition: transform 0.3s ease;
+}
+.testimonial-card:hover { transform: translateY(-5px); }
+.testimonial-card p { font-size: 1rem; color: #444; margin-bottom: 15px; }
+.testimonial-card span { font-weight: 600; color: #111; font-size: 0.9rem; }
+
+/* CTA */
+.cta {
+  padding: 140px 20px;
+  text-align: center;
+  background: linear-gradient(90deg, rgba(255,36,237,0.15), rgba(47,250,47,0.15));
+}
+.cta h2 { font-size: 2.5rem; margin-bottom: 20px; color: #111; }
+.cta p  { font-size: 1.2rem; margin-bottom: 30px; color: #333; }
+.cta .btn { font-size: 1.2rem; padding: 14px 32px; }
