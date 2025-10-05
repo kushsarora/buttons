@@ -1,0 +1,63 @@
+/* Background with your brand gradient */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #ff24ed, #2ffa2f);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+}
+
+/* Card */
+.login-card {
+  background: rgba(31, 36, 33, 0.9); 
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  border: 2px solid #ff24ed; /* pink border */
+}
+
+/* Title + Subtitle */
+.login-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2ffa2f; /* green title */
+}
+
+.login-subtitle {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #fff;
+  opacity: 0.9;
+}
+
+/* Google Button Wrapper */
+.google-button {
+  display: flex;
+  justify-content: center;
+}
+
+/* Back Button */
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.back-btn:hover {
+  background-color: white;
+  color: black;
+}
