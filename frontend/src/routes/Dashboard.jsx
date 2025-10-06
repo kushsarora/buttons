@@ -13,26 +13,22 @@ export default function Dashboard() {
   const [editingClass, setEditingClass] = useState(null);
   const navigate = useNavigate();
 
-  // --- Logout ---
   const handleLogout = () => {
     localStorage.removeItem("user");
     window.location.href = "/";
   };
 
-  // --- Load all classes for current user ---
   const loadClasses = async () => {
     const data = await apiFetch("/api/classes");
     setClasses(data.classes || []);
   };
 
-  // --- Delete a class ---
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this class?")) return;
     await apiFetch(`/api/classes/${id}`, { method: "DELETE" });
     loadClasses();
   };
 
-  // --- On mount ---
   useEffect(() => {
     loadClasses();
   }, []);
@@ -69,7 +65,22 @@ export default function Dashboard() {
               classes.map((cls) => (
                 <div className="class-card" key={cls.id}>
                   <div className="class-header">
-                    <h2 className="class-title">{cls.code || "Untitled"}</h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span
+                        title="Class color"
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          background: cls.color,
+                          display: "inline-block",
+                          boxShadow: "0 0 0 2px rgba(0,0,0,0.05)",
+                        }}
+                      />
+                      <h2 className="class-title" style={{ margin: 0 }}>
+                        {cls.code || "Untitled"}
+                      </h2>
+                    </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button
                         className="edit-btn"

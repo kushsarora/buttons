@@ -8,7 +8,6 @@ from services.ai_parser import parse_with_ai
 bp = Blueprint("classes", __name__, url_prefix="/api")
 
 def get_current_user(db):
-    """Creates/returns user based on headers from frontend."""
     uid = request.headers.get("X-User-Id")
     email = request.headers.get("X-User-Email")
     name = request.headers.get("X-User-Name", "")
@@ -20,6 +19,16 @@ def get_current_user(db):
         db.add(user)
         db.commit()
     return user
+
+
+def pick_class_color(seed: str) -> str:
+    palette = [
+        "#216869", "#49A078", "#74C0FC", "#FFD43B",
+        "#FF6B6B", "#9CC5A1", "#1F2421", "#9b59b6",
+    ]
+    h = sum(ord(c) for c in (seed or "")) if seed else 0
+    return palette[h % len(palette)]
+
 
 @bp.post("/classes/parse")
 def parse_class():
@@ -37,6 +46,7 @@ def parse_class():
         return jsonify({"draft": parsed})
     finally:
         db.close()
+
 
 @bp.post("/classes")
 def create_class():
@@ -70,6 +80,7 @@ def create_class():
     finally:
         db.close()
 
+
 @bp.get("/classes")
 def list_classes():
     db = SessionLocal()
@@ -81,6 +92,7 @@ def list_classes():
         classes = db.query(Class).filter_by(user_id=user.id).all()
         out = []
         for c in classes:
+            label = c.code or c.title or ""
             out.append({
                 "id": c.id,
                 "title": c.title,
@@ -89,11 +101,13 @@ def list_classes():
                 "term": c.term,
                 "meetings_count": len(c.meetings or []),
                 "assignments_count": len(c.assignments or []),
-                "exams_count": len(c.exams or [])
+                "exams_count": len(c.exams or []),
+                "color": pick_class_color(label),
             })
         return jsonify({"classes": out})
     finally:
         db.close()
+
 
 @bp.delete("/classes/<class_id>")
 def delete_class(class_id):
@@ -113,7 +127,8 @@ def delete_class(class_id):
     finally:
         db.close()
 
-@bp.put("/<class_id>")
+
+@bp.put("/classes/<class_id>")
 def update_class(class_id):
     db = SessionLocal()
     try:

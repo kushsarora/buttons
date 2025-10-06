@@ -16,13 +16,14 @@
 .legend .box {
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: 50%;
 }
 
 .box.meeting { background: #74C0FC; } /* blue */
 .box.assignment { background: #FFD43B; } /* yellow */
 .box.exam { background: #FF6B6B; } /* red */
 .box.custom { background: #49A078; } /* green */
+.box.study { background: #9CC5A1; } /* light green */
 
 .calendar-container {
   margin-top: 20px;
@@ -46,16 +47,13 @@
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 420px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.modal-card h2 {
-  margin: 0;
-  color: #111;
-}
+.modal-card h2 { margin: 0; color: #111; }
 
 .modal-card input, .modal-card select {
   width: 100%;
@@ -89,7 +87,7 @@
   cursor: pointer;
 }
 
-/* === COLOR THEME FOR FULLCALENDAR === */
+/* ==== FullCalendar theme tweaks (no forced gradient) ==== */
 .fc {
   --fc-button-bg-color: #ff24ed;
   --fc-button-border-color: #ff24ed;
@@ -104,25 +102,37 @@
   font-weight: 700;
 }
 
+/* Let each event's own 'color' control the background */
 .fc-event {
-  background: linear-gradient(90deg, #ff24ed, #2ffa2f);
   border: none;
-  color: white;
-  font-weight: 600;
-  border-radius: 6px;
+  border-radius: 8px;
+  color: var(--fc-event-text-color, #fff);
+  padding: 0 2px;
 }
 
-.fc-daygrid-day-number {
-  color: #111;
-  font-weight: 600;
+/* Inner layout of our custom event content */
+.event-bubble {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
-.fc-theme-standard td,
-.fc-theme-standard th {
-  border-color: #eee;
+.event-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 10px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
 }
 
-.fc-scrollgrid {
-  border-radius: 12px;
+.event-text {
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.fc-daygrid-day-number { color: #111; font-weight: 600; }
+.fc-theme-standard td, .fc-theme-standard th { border-color: #eee; }
+.fc-scrollgrid { border-radius: 12px; overflow: hidden; }
