@@ -1,14 +1,14 @@
 import uuid
 from flask import Blueprint, request, jsonify
 from db.base import SessionLocal
-from db.models import User, Class, Requirement
+from db.models import User, Class
 from services.parser_service import extract_text_from_upload
 from services.ai_parser import parse_with_ai
 
 bp = Blueprint("classes", __name__, url_prefix="/api")
 
 def get_current_user(db):
-    """Pulls user from headers (frontend sends X-User-Id, X-User-Email)."""
+    """Creates/returns user based on headers from frontend."""
     uid = request.headers.get("X-User-Id")
     email = request.headers.get("X-User-Email")
     name = request.headers.get("X-User-Name", "")
@@ -45,7 +45,8 @@ def create_class():
         user = get_current_user(db)
         if not user:
             return jsonify({"error": "Unauthorized"}), 401
-        data = request.json
+
+        data = request.json or {}
         class_id = str(uuid.uuid4())
 
         new_class = Class(
@@ -55,24 +56,15 @@ def create_class():
             code=data.get("code"),
             instructor=data.get("instructor"),
             term=data.get("term"),
-            location=data.get("location"),
-            meeting_times=data.get("meeting_times"),
-            grading_policy=data.get("grading_policy"),
             notes=data.get("notes"),
+            grading_policy=data.get("grading_policy"),
+            meetings=data.get("meetings", []),
+            assignments=data.get("assignments", []),
+            exams=data.get("exams", []),
+            schedule=data.get("schedule", [])
         )
+
         db.add(new_class)
-
-        for r in data.get("requirements", []):
-            db.add(Requirement(
-                id=str(uuid.uuid4()),
-                class_id=class_id,
-                kind=r.get("kind"),
-                title=r.get("title"),
-                weight=r.get("weight"),
-                due=r.get("due"),
-                details=r.get("details"),
-            ))
-
         db.commit()
         return jsonify({"success": True, "id": class_id})
     finally:
@@ -85,14 +77,66 @@ def list_classes():
         user = get_current_user(db)
         if not user:
             return jsonify({"error": "Unauthorized"}), 401
+
         classes = db.query(Class).filter_by(user_id=user.id).all()
-        out = [{
-            "id": c.id,
-            "title": c.title,
-            "code": c.code,
-            "instructor": c.instructor,
-            "term": c.term,
-        } for c in classes]
+        out = []
+        for c in classes:
+            out.append({
+                "id": c.id,
+                "title": c.title,
+                "code": c.code,
+                "instructor": c.instructor,
+                "term": c.term,
+                "meetings_count": len(c.meetings or []),
+                "assignments_count": len(c.assignments or []),
+                "exams_count": len(c.exams or [])
+            })
         return jsonify({"classes": out})
+    finally:
+        db.close()
+
+@bp.delete("/classes/<class_id>")
+def delete_class(class_id):
+    db = SessionLocal()
+    try:
+        user = get_current_user(db)
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        cls = db.query(Class).filter_by(id=class_id, user_id=user.id).first()
+        if not cls:
+            return jsonify({"error": "Class not found"}), 404
+
+        db.delete(cls)
+        db.commit()
+        return jsonify({"success": True})
+    finally:
+        db.close()
+
+@bp.put("/<class_id>")
+def update_class(class_id):
+    db = SessionLocal()
+    try:
+        user = get_current_user(db)
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data = request.json or {}
+        cls = db.query(Class).filter_by(id=class_id, user_id=user.id).first()
+        if not cls:
+            return jsonify({"error": "Class not found"}), 404
+
+        cls.title = data.get("title", cls.title)
+        cls.code = data.get("code", cls.code)
+        cls.instructor = data.get("instructor", cls.instructor)
+        cls.term = data.get("term", cls.term)
+        cls.notes = data.get("notes", cls.notes)
+        cls.grading_policy = data.get("grading_policy", cls.grading_policy)
+        cls.meetings = data.get("meetings", cls.meetings)
+        cls.assignments = data.get("assignments", cls.assignments)
+        cls.exams = data.get("exams", cls.exams)
+
+        db.commit()
+        return jsonify({"success": True, "updated": class_id})
     finally:
         db.close()
