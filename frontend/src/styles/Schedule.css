@@ -1,0 +1,128 @@
+.legend {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.legend .box {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.box.meeting { background: #74C0FC; } /* blue */
+.box.assignment { background: #FFD43B; } /* yellow */
+.box.exam { background: #FF6B6B; } /* red */
+.box.custom { background: #49A078; } /* green */
+
+.calendar-container {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-card h2 {
+  margin: 0;
+  color: #111;
+}
+
+.modal-card input, .modal-card select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.primary {
+  background: #49A078;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.secondary {
+  background: #eee;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* === COLOR THEME FOR FULLCALENDAR === */
+.fc {
+  --fc-button-bg-color: #ff24ed;
+  --fc-button-border-color: #ff24ed;
+  --fc-button-text-color: #fff;
+  --fc-button-hover-bg-color: #2ffa2f;
+  --fc-button-hover-border-color: #2ffa2f;
+  --fc-today-bg-color: rgba(255, 36, 237, 0.08);
+}
+
+.fc .fc-toolbar-title {
+  color: #111;
+  font-weight: 700;
+}
+
+.fc-event {
+  background: linear-gradient(90deg, #ff24ed, #2ffa2f);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.fc-daygrid-day-number {
+  color: #111;
+  font-weight: 600;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #eee;
+}
+
+.fc-scrollgrid {
+  border-radius: 12px;
+  overflow: hidden;
+}

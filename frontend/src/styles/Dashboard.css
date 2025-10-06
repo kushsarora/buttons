@@ -122,3 +122,55 @@
   background: #ff24ed;
   color: #fff;
 }
+
+/* Delete Button */
+.class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+.delete-btn:hover {
+  color: #ff24ed;
+}
+
+.edit-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #49A078;
+  transition: color 0.2s ease;
+}
+.edit-btn:hover {
+  color: #ff24ed;
+}
+
+.class-title {
+  font-size: 1.1rem;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.class-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+.sidebar-btn.active {
+  background: linear-gradient(90deg, rgba(255, 36, 237, 0.15), rgba(47, 250, 47, 0.15));
+  border-left: 4px solid #ff24ed;
+  color: #111;
+  font-weight: 600;
+}
+

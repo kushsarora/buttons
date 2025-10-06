@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./routes/Home.jsx";
 import Login from "./routes/Login.jsx";
 import Dashboard from "./routes/Dashboard.jsx";
+import Schedule from "./routes/Schedule.jsx"; // ✅ NEW PAGE
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -17,6 +18,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <Schedule />
             </ProtectedRoute>
           }
         />

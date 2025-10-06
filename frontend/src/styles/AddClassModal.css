@@ -1,48 +1,200 @@
+/* === BACKDROP === */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: radial-gradient(circle at top left, rgba(255,36,237,0.15), transparent 50%),
+              radial-gradient(circle at bottom right, rgba(47,250,47,0.15), transparent 50%),
+              rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
+
+/* === CARD CONTAINER === */
 .modal-card {
   background: #fff;
-  border-radius: 10px;
-  padding: 30px;
-  width: 500px;
-  position: relative;
   color: #111;
+  border-radius: 22px;
+  padding: 48px;
+  width: 95vw !important;       /* ✅ full responsive width */
+  max-width: 1700px !important; /* ✅ enforce full width */
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  box-shadow: 0 10px 45px rgba(0, 0, 0, 0.25);
+  border: 3px solid #ff24ed25;
+  transition: all 0.25s ease;
 }
+
+/* === CLOSE BUTTON === */
 .modal-card .close {
   position: absolute;
-  top: 10px;
-  right: 14px;
-  font-size: 20px;
-  background: none;
-  border: none;
+  top: 16px;
+  right: 24px;
+  font-size: 30px;
+  font-weight: bold;
+  border: 0;
+  background: transparent;
+  color: #555;
   cursor: pointer;
+  transition: color 0.2s ease;
 }
+.modal-card .close:hover {
+  color: #ff24ed;
+}
+
+/* === SCROLLBAR (pink → green gradient) === */
+.modal-card::-webkit-scrollbar {
+  width: 12px;
+}
+.modal-card::-webkit-scrollbar-thumb {
+  background: linear-gradient(#ff24ed, #2ffa2f);
+  border-radius: 10px;
+}
+.modal-card::-webkit-scrollbar-track {
+  background: rgba(240,240,240,0.6);
+}
+
+/* === STEPS === */
 .upload-step,
 .edit-step {
   display: flex;
   flex-direction: column;
+  gap: 24px;
+}
+
+/* === FIELD LAYOUT === */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  width: 100%;
+}
+.grid-2 input,
+.grid-2 textarea {
+  width: 100%;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+.grid-2 textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* === TABLES === */
+.table {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
-.primary {
-  background: #2ffa2f;
+.thead,
+.trow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.3fr 2.4fr 70px; /* ✅ balanced horizontal layout */
+  gap: 10px;
+  align-items: center;
+}
+.thead {
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+.trow input,
+.trow select {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+.trow select {
+  background: #fff;
+}
+
+/* === MINI BUTTONS === */
+.mini {
+  align-self: flex-start;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(47, 250, 47, 0.15);
   color: #111;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+.mini:hover {
+  background: rgba(47, 250, 47, 0.3);
+}
+.mini.danger {
+  background: rgba(255, 36, 237, 0.1);
+  color: #ff24ed;
+}
+.mini.danger:hover {
+  background: rgba(255, 36, 237, 0.25);
+}
+
+/* === ACTIONS === */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 24px;
+}
+.primary {
+  background: linear-gradient(90deg, #ff24ed, #2ffa2f);
+  color: #fff;
+  border: 0;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 .primary:hover {
-  background: #ff24ed;
-  color: #fff;
+  opacity: 0.9;
+  transform: translateY(-2px);
 }
-.error {
-  color: red;
-  font-size: 0.9rem;
+.secondary {
+  background: #eee;
+  border: 0;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* === TITLES === */
+.edit-step h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 10px;
+}
+h3 {
+  font-size: 1.45rem;
+  color: #111;
+  margin-top: 18px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .modal-card {
+    width: 95vw !important;
+    padding: 30px;
+  }
+  .thead,
+  .trow {
+    grid-template-columns: 1.5fr 0.8fr 1fr 1.8fr 50px;
+  }
 }
