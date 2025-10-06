@@ -12,6 +12,8 @@ node_modules/
 dist/
 .env.local
 
+package-lock.json
+
 # macOS
 .DS_Store
 
