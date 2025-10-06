@@ -11,12 +11,15 @@ load_dotenv()
 # --- Initialize Flask app ---
 app = Flask(__name__)
 
-# ✅ GLOBAL CORS FIX
-# Allow all endpoints (including /auth/google and /api/...) from your Vite dev server
-CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
+# ✅ Enable CORS for frontend dev
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+])
 
 # --- Google Login Configuration ---
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
 
 @app.route("/auth/google", methods=["POST"])
 def google_login():
@@ -24,32 +27,25 @@ def google_login():
     token = request.json.get("id_token")
 
     try:
-        # Verify the ID token with Google
+        # Verify token with Google
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
-
         user_id = idinfo["sub"]
         email = idinfo["email"]
         name = idinfo.get("name", "")
 
-        # Return basic user data to frontend (DB handled separately)
         return jsonify({
             "success": True,
-            "user": {
-                "id": user_id,
-                "email": email,
-                "name": name
-            }
+            "user": {"id": user_id, "email": email, "name": name}
         })
-
     except Exception as e:
         print(f"[Auth Error] {e}")
         return jsonify({"success": False, "error": str(e)}), 400
 
 
-# --- Health check route ---
+# --- Health Check Route ---
 @app.route("/api/ping", methods=["GET"])
 def ping():
-    """Quick check to make sure backend + env are set."""
+    """Quick health check for backend and env."""
     has_key = bool(os.getenv("OPENAI_API_KEY"))
     db_url = os.getenv("DATABASE_URL", "Not set")
     return jsonify({
@@ -59,19 +55,26 @@ def ping():
     })
 
 
-# --- Database initialization ---
+# --- Database Initialization ---
 from db.base import engine
 from db.models import Base
 
-# Automatically create tables (users, classes, requirements)
+# Automatically create tables
 Base.metadata.create_all(bind=engine)
 
-
-# --- Register Blueprints (Routes) ---
+# --- Register Routes ---
 from routes.class_routes import bp as classes_bp
 app.register_blueprint(classes_bp)
 
+# ✅ Import and register the schedule routes
+try:
+    from routes.schedule_routes import bp as schedule_bp
+    app.register_blueprint(schedule_bp)
+    print("✅ Loaded /api/schedule routes successfully.")
+except Exception as e:
+    print(f"⚠️ Could not load schedule routes: {e}")
 
-# --- Run the app ---
+# --- Run the App ---
 if __name__ == "__main__":
+    print("🚀 Flask backend starting on port 5000...")
     app.run(port=5000, debug=True)
