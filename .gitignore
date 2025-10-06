@@ -17,6 +17,7 @@ package-lock.json
 # macOS
 .DS_Store
 
+frontend/src/assets/logo1.png
 # Logs
 *.log
 
