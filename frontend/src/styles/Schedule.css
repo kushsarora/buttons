@@ -87,7 +87,7 @@
   cursor: pointer;
 }
 
-/* ==== FullCalendar theme tweaks (no forced gradient) ==== */
+/* ==== FullCalendar theme tweaks ==== */
 .fc {
   --fc-button-bg-color: #ff24ed;
   --fc-button-border-color: #ff24ed;
@@ -102,21 +102,45 @@
   font-weight: 700;
 }
 
-/* Let each event's own 'color' control the background */
+/* === Event blocks === */
 .fc-event {
-  border: none;
-  border-radius: 8px;
-  color: var(--fc-event-text-color, #fff);
-  padding: 0 2px;
+  background: var(--event-bg, #49A078) !important;
+  color: var(--event-text, #fff) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  font-size: 0.95rem !important;
+  line-height: 1.3 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  min-height: 42px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  white-space: normal !important;
 }
 
-/* Inner layout of our custom event content */
+/* Multi-line event text */
+.event-text {
+  white-space: normal !important;
+  overflow: hidden !important;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;  /* allow up to 3 lines */
+  -webkit-box-orient: vertical;
+  line-height: 1.25;
+  max-height: calc(1.25em * 3);
+  max-width: 100%;
+}
+
+/* Layout of colored dot + text */
 .event-bubble {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 700;
   font-size: 0.9rem;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .event-dot {
@@ -127,12 +151,24 @@
   box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
 }
 
-.event-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Allow day boxes to expand */
+.fc-daygrid-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 40px;
+  overflow: visible !important;
 }
 
+.fc-daygrid-event-harness {
+  height: auto !important;
+}
+
+.fc-daygrid-day {
+  vertical-align: top !important;
+}
+
+/* Numbers, borders */
 .fc-daygrid-day-number { color: #111; font-weight: 600; }
 .fc-theme-standard td, .fc-theme-standard th { border-color: #eee; }
 .fc-scrollgrid { border-radius: 12px; overflow: hidden; }
