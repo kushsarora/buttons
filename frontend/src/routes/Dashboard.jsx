@@ -49,9 +49,29 @@ export default function Dashboard() {
       <div className="dashboard-content">
         {/* Sidebar */}
         <aside className="sidebar">
-          <button className="sidebar-btn active">My Classes</button>
-          <button className="sidebar-btn" onClick={() => navigate("/schedule")}>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/dashboard" ? "active" : ""
+            }`}
+            onClick={() => navigate("/dashboard")}
+          >
+            My Classes
+          </button>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/schedule" ? "active" : ""
+            }`}
+            onClick={() => navigate("/schedule")}
+          >
             Schedule
+          </button>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/chat" ? "active" : ""
+            }`}
+            onClick={() => navigate("/chat")}
+          >
+            Chat with AI
           </button>
         </aside>
 

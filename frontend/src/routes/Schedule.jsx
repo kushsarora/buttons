@@ -25,7 +25,6 @@ export default function Schedule() {
   const navigate = useNavigate();
   const calendarRef = useRef();
 
-  // === Local settings for AI scheduling ===
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem("aiSettings");
     return saved
@@ -118,7 +117,6 @@ export default function Schedule() {
     }
   };
 
-  // Custom render: colored dot + text
   const eventRender = (arg) => {
     const dotColor = arg.event.extendedProps?.dotColor || "#111";
     const title = arg.event.title;
@@ -130,7 +128,6 @@ export default function Schedule() {
     );
   };
 
-  // --- AI Auto Scheduling ---
   const handleAutoSchedule = async () => {
     if (loadingAI) return;
     setLoadingAI(true);
@@ -166,10 +163,30 @@ export default function Schedule() {
       <div className="dashboard-content">
         {/* Sidebar */}
         <aside className="sidebar">
-          <button className="sidebar-btn" onClick={() => navigate("/dashboard")}>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/dashboard" ? "active" : ""
+            }`}
+            onClick={() => navigate("/dashboard")}
+          >
             My Classes
           </button>
-          <button className="sidebar-btn active">Schedule</button>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/schedule" ? "active" : ""
+            }`}
+            onClick={() => navigate("/schedule")}
+          >
+            Schedule
+          </button>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/chat" ? "active" : ""
+            }`}
+            onClick={() => navigate("/chat")}
+          >
+            Chat with AI
+          </button>
         </aside>
 
         {/* Main Panel */}
@@ -248,7 +265,7 @@ export default function Schedule() {
         </main>
       </div>
 
-      {/* Add Event Modal */}
+      {/* Modals */}
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal-card">
@@ -315,7 +332,6 @@ export default function Schedule() {
         </div>
       )}
 
-      {/* ⚙️ AI SETTINGS MODAL */}
       {showSettings && (
         <div className="modal-backdrop">
           <div className="modal-card" style={{ width: "450px" }}>

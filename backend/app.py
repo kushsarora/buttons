@@ -66,13 +66,21 @@ Base.metadata.create_all(bind=engine)
 from routes.class_routes import bp as classes_bp
 app.register_blueprint(classes_bp)
 
-# ✅ Import and register the schedule routes
+# ✅ Register Schedule Routes
 try:
     from routes.schedule_routes import bp as schedule_bp
     app.register_blueprint(schedule_bp)
     print("✅ Loaded /api/schedule routes successfully.")
 except Exception as e:
     print(f"⚠️ Could not load schedule routes: {e}")
+
+# ✅ Register Chat AI Routes
+try:
+    from routes.chat_routes import bp as chat_bp
+    app.register_blueprint(chat_bp)
+    print("✅ Loaded /api/chat routes successfully.")
+except Exception as e:
+    print(f"⚠️ Could not load chat routes: {e}")
 
 # --- Run the App ---
 if __name__ == "__main__":
