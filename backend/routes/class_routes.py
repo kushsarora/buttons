@@ -83,6 +83,11 @@ def create_class():
 
 @bp.get("/classes")
 def list_classes():
+    """
+    Returns all classes for the logged-in user.
+    Includes full class data (meetings, assignments, exams, etc.)
+    so the Edit modal can prefill properly.
+    """
     db = SessionLocal()
     try:
         user = get_current_user(db)
@@ -99,9 +104,13 @@ def list_classes():
                 "code": c.code,
                 "instructor": c.instructor,
                 "term": c.term,
-                "meetings_count": len(c.meetings or []),
-                "assignments_count": len(c.assignments or []),
-                "exams_count": len(c.exams or []),
+                "notes": c.notes,
+                "grading_policy": c.grading_policy,
+                "meetings": c.meetings or [],
+                "assignments": c.assignments or [],
+                "exams": c.exams or [],
+                "schedule": c.schedule or [],
+                "custom_events": c.custom_events or [],
                 "color": pick_class_color(label),
             })
         return jsonify({"classes": out})
@@ -141,6 +150,7 @@ def update_class(class_id):
         if not cls:
             return jsonify({"error": "Class not found"}), 404
 
+        # Update all editable fields
         cls.title = data.get("title", cls.title)
         cls.code = data.get("code", cls.code)
         cls.instructor = data.get("instructor", cls.instructor)
@@ -150,8 +160,11 @@ def update_class(class_id):
         cls.meetings = data.get("meetings", cls.meetings)
         cls.assignments = data.get("assignments", cls.assignments)
         cls.exams = data.get("exams", cls.exams)
+        cls.schedule = data.get("schedule", cls.schedule)
+        cls.custom_events = data.get("custom_events", cls.custom_events)
 
         db.commit()
+        db.refresh(cls)
         return jsonify({"success": True, "updated": class_id})
     finally:
         db.close()

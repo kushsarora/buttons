@@ -21,14 +21,22 @@ CORS(app, supports_credentials=True, origins=[
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 
+from google.oauth2 import id_token
+from google.auth.transport import requests
+import time
+
 @app.route("/auth/google", methods=["POST"])
 def google_login():
     """Handle Google Sign-In token verification."""
     token = request.json.get("id_token")
 
     try:
-        # Verify token with Google
-        idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=5  
+        )
         user_id = idinfo["sub"]
         email = idinfo["email"]
         name = idinfo.get("name", "")
@@ -40,6 +48,7 @@ def google_login():
     except Exception as e:
         print(f"[Auth Error] {e}")
         return jsonify({"success": False, "error": str(e)}), 400
+
 
 
 # --- Health Check Route ---
