@@ -8,7 +8,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def parse_with_ai(text: str) -> dict:
     """
     Uses GPT-4o-mini to parse syllabus text into structured JSON.
-    Pulls title, term, instructor, assignments (weights/due), exams (weights/dates), and notes.
+    Pulls title, term, instructor, assignments, exams, meetings, and notes.
     """
     if not text or len(text.strip()) < 100:
         print("[AI Parser] ⚠️ Syllabus text too short or empty.")
@@ -18,11 +18,12 @@ def parse_with_ai(text: str) -> dict:
             "instructor": None,
             "assignments": [],
             "exams": [],
+            "meetings": [],
             "notes": None
         }
 
     system_prompt = (
-        "You are an AI that extracts structured information from university course syllabi. "
+        "You are an AI that extracts structured information from a university course syllabus. "
         "Return ONLY valid JSON — no markdown, no commentary."
     )
 
@@ -35,24 +36,35 @@ def parse_with_ai(text: str) -> dict:
       "assignments": [
         {{
           "title": string,
-          "weight": float | null,      // percent weight of total grade (omit % symbol)
-          "due_date": string | null,   // human-readable date if present
+          "weight": float | null,
+          "due_date": string | null,
           "details": string | null
         }}
       ],
       "exams": [
         {{
-          "title": string,             // e.g., "Midterm 1", "Final Exam"
-          "weight": float | null,      // percent weight
-          "date": string | null,       // exam date if present
+          "title": string,
+          "weight": float | null,
+          "date": string | null,
           "details": string | null
+        }}
+      ],
+      "meetings": [
+        {{
+          "type": string,           // Lecture, Discussion, Lab, Office Hours, etc.
+          "day": string,            // e.g. "Mon", "Tue", "Wed"
+          "start_time": string,     // 24h format HH:MM if available
+          "end_time": string,       // 24h format HH:MM if available
+          "location": string | null // building/room if listed
         }}
       ],
       "notes": string | null
     }}
 
-    If weight is written like "15%" return 15. If unknown, return null.
-    Try to infer title/term/instructor from header blocks if not explicit.
+    - Only return meetings that recur weekly (lecture, lab, discussion, etc.).
+    - If multiple sections exist, list each separately.
+    - Try to infer missing details logically (e.g., “MWF 9:00–9:50 AM”).
+    - If no meeting times found, return an empty list.
     Syllabus text:
     {text[:15000]}
     """
@@ -72,23 +84,27 @@ def parse_with_ai(text: str) -> dict:
             print("[AI Parser] ⚠️ Empty model response.")
             return {
                 "title": None, "term": None, "instructor": None,
-                "assignments": [], "exams": [], "notes": None
+                "assignments": [], "exams": [], "meetings": [], "notes": None
             }
 
         try:
             data = json.loads(content)
             print("[AI Parser] ✅ Parsed syllabus successfully.")
+            # Ensure all keys exist
+            for key in ["assignments", "exams", "meetings"]:
+                if key not in data or not isinstance(data[key], list):
+                    data[key] = []
             return data
         except json.JSONDecodeError:
             print("[AI Parser] ⚠️ Invalid JSON returned.")
             return {
                 "title": None, "term": None, "instructor": None,
-                "assignments": [], "exams": [], "notes": None
+                "assignments": [], "exams": [], "meetings": [], "notes": None
             }
 
     except Exception as e:
         print(f"[AI Parser Error] {e}")
         return {
             "title": None, "term": None, "instructor": None,
-            "assignments": [], "exams": [], "notes": None
+            "assignments": [], "exams": [], "meetings": [], "notes": None
         }
