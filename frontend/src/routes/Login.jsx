@@ -6,7 +6,8 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleCredentialResponse = async (response) => {
-    const res = await fetch("http://localhost:5000/auth/google", {
+    const backendURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const res = await fetch(`${backendURL}/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id_token: response.credential }),
