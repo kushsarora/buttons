@@ -17,7 +17,7 @@ This repository contains a full-stack application with a Python backend and a Re
     - `styles/` - CSS files
     - `assets/` - Images and static assets
   - `index.html` - Main HTML file
-  - `package.json` - Frontend dependencies
+   - `package.json` - Frontend dependencies (includes `lucide-react`)
 
 ## Getting Started
 
