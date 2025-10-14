@@ -2,6 +2,7 @@ import "../styles/Dashboard.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
+import { Sparkles, LogOut, BookOpen, Calendar, MessageSquare, Plus, Settings, Trash2 } from "lucide-react";
 import AddClassModal from "./AddClassModal";
 import EditClassModal from "./EditClassModal";
 
@@ -37,10 +38,16 @@ export default function Dashboard() {
     <div className="dashboard">
       {/* Top Navbar */}
       <nav className="dashboard-nav">
-        <div className="logo">BUTTONS</div>
+        <div className="logo">
+          <div className="logo-icon">
+            <Sparkles className="logo-sparkle" />
+          </div>
+          <span>BUTTONS</span>
+        </div>
         <div className="user-info">
-          <span>{user?.name}</span>
+          <span className="user-name">{user?.name}</span>
           <button onClick={handleLogout} className="logout-btn">
+            <LogOut className="btn-icon" />
             Logout
           </button>
         </div>
@@ -55,6 +62,7 @@ export default function Dashboard() {
             }`}
             onClick={() => navigate("/dashboard")}
           >
+            <BookOpen className="sidebar-icon" />
             My Classes
           </button>
           <button
@@ -63,6 +71,7 @@ export default function Dashboard() {
             }`}
             onClick={() => navigate("/schedule")}
           >
+            <Calendar className="sidebar-icon" />
             Schedule
           </button>
           <button
@@ -71,74 +80,75 @@ export default function Dashboard() {
             }`}
             onClick={() => navigate("/chat")}
           >
+            <MessageSquare className="sidebar-icon" />
             Chat with AI
           </button>
         </aside>
 
         {/* Main Content */}
         <main className="main-panel">
-          <h1>Welcome back, {user?.name} 👋</h1>
-          <p className="subtitle">Here’s an overview of your classes:</p>
+          <div className="welcome-header">
+            <h1>Welcome back, {user?.name} 👋</h1>
+            <p className="subtitle">Here's an overview of your classes</p>
+          </div>
 
           <div className="class-grid">
             {classes.length > 0 ? (
               classes.map((cls) => (
                 <div className="class-card" key={cls.id}>
                   <div className="class-header">
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div className="class-title-wrapper">
                       <span
-                        title="Class color"
-                        style={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: "50%",
-                          background: cls.color,
-                          display: "inline-block",
-                          boxShadow: "0 0 0 2px rgba(0,0,0,0.05)",
-                        }}
+                        className="color-dot"
+                        style={{ background: cls.color }}
                       />
-                      <h2 className="class-title" style={{ margin: 0 }}>
+                      <h2 className="class-title">
                         {cls.code || "Untitled"}
                       </h2>
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div className="card-actions">
                       <button
-                        className="edit-btn"
+                        className="icon-btn edit-btn"
                         onClick={() => {
                           setEditingClass(cls);
                           setEditOpen(true);
                         }}
+                        title="Edit class"
                       >
-                        ⚙️
+                        <Settings className="action-icon" />
                       </button>
                       <button
-                        className="delete-btn"
+                        className="icon-btn delete-btn"
                         onClick={() => handleDelete(cls.id)}
+                        title="Delete class"
                       >
-                        ✕
+                        <Trash2 className="action-icon" />
                       </button>
                     </div>
                   </div>
 
-                  <p className="class-text">{cls.title}</p>
-                  <p className="class-text">
-                    <strong>Instructor:</strong> {cls.instructor || "—"}
-                  </p>
-                  <p className="class-text">
-                    <strong>Term:</strong> {cls.term || "—"}
-                  </p>
+                  <p className="class-name">{cls.title}</p>
+                  <div className="class-details">
+                    <p className="class-text">
+                      <strong>Instructor:</strong> {cls.instructor || "—"}
+                    </p>
+                    <p className="class-text">
+                      <strong>Term:</strong> {cls.term || "—"}
+                    </p>
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="class-card">
-                <p>No classes yet. Add your first one below!</p>
+              <div className="class-card empty-card">
+                <p>No classes yet. Add your first one!</p>
               </div>
             )}
 
             {/* Add Class Button */}
             <div className="class-card add-card">
               <button className="add-class-btn" onClick={() => setOpen(true)}>
-                + Add New Class
+                <Plus className="add-icon" />
+                Add New Class
               </button>
             </div>
           </div>

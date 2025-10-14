@@ -1,11 +1,9 @@
-// src/routes/ChatAI.jsx
 import "../styles/ChatAI.css";
+import "../styles/Dashboard.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
-import "../styles/Dashboard.css";
-
-
+import { Sparkles, LogOut, BookOpen, Calendar, MessageSquare, Send } from "lucide-react";
 
 export default function ChatAI() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -37,7 +35,7 @@ export default function ChatAI() {
       if (res.reply) {
         setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I couldn’t process that right now." }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I couldn't process that right now." }]);
       }
     } catch (err) {
       setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Error: " + err.message }]);
@@ -55,10 +53,16 @@ export default function ChatAI() {
     <div className="dashboard">
       {/* Navbar */}
       <nav className="dashboard-nav">
-        <div className="logo">BUTTONS</div>
+        <div className="logo">
+          <div className="logo-icon">
+            <Sparkles className="logo-sparkle" />
+          </div>
+          <span>BUTTONS</span>
+        </div>
         <div className="user-info">
-          <span>{user?.name}</span>
+          <span className="user-name">{user?.name}</span>
           <button onClick={handleLogout} className="logout-btn">
+            <LogOut className="btn-icon" />
             Logout
           </button>
         </div>
@@ -67,83 +71,84 @@ export default function ChatAI() {
       <div className="dashboard-content">
         {/* Sidebar */}
         <aside className="sidebar">
-          <button className="sidebar-btn" onClick={() => navigate("/dashboard")}>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/dashboard" ? "active" : ""
+            }`}
+            onClick={() => navigate("/dashboard")}
+          >
+            <BookOpen className="sidebar-icon" />
             My Classes
           </button>
-          <button className="sidebar-btn" onClick={() => navigate("/schedule")}>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/schedule" ? "active" : ""
+            }`}
+            onClick={() => navigate("/schedule")}
+          >
+            <Calendar className="sidebar-icon" />
             Schedule
           </button>
-          <button className="sidebar-btn active">Chat with AI</button>
+          <button
+            className={`sidebar-btn ${
+              window.location.pathname === "/chat" ? "active" : ""
+            }`}
+            onClick={() => navigate("/chat")}
+          >
+            <MessageSquare className="sidebar-icon" />
+            Chat with AI
+          </button>
         </aside>
 
         {/* Chat Panel */}
-        <main className="main-panel" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          <h1>💬 Chat with AI</h1>
-          <p className="subtitle">Ask about your upcoming deadlines, class times, or study sessions.</p>
+        <main className="main-panel chat-main">
+          <div className="welcome-header">
+            <h1>💬 Chat with AI</h1>
+            <p className="subtitle">Ask about your upcoming deadlines, class times, or study sessions</p>
+          </div>
 
-          <div
-            style={{
-              flex: 1,
-              background: "#fff",
-              borderRadius: "12px",
-              padding: "20px",
-              overflowY: "auto",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-            }}
-          >
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                  marginBottom: "12px",
-                }}
-              >
+          <div className="chat-container">
+            <div className="messages-wrapper">
+              {messages.map((msg, idx) => (
                 <div
-                  style={{
-                    background:
-                      msg.role === "user"
-                        ? "linear-gradient(90deg,#ff24ed,#2ffa2f)"
-                        : "#f1f1f1",
-                    color: msg.role === "user" ? "#fff" : "#111",
-                    padding: "10px 14px",
-                    borderRadius: "14px",
-                    maxWidth: "70%",
-                    whiteSpace: "pre-wrap",
-                  }}
+                  key={idx}
+                  className={`message-row ${msg.role === "user" ? "user-row" : "ai-row"}`}
                 >
-                  {msg.content}
+                  <div className={`chat-bubble ${msg.role === "user" ? "user-bubble" : "ai-bubble"}`}>
+                    {msg.content}
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div ref={chatEndRef}></div>
+              ))}
+              {loading && (
+                <div className="message-row ai-row">
+                  <div className="chat-bubble ai-bubble typing">
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef}></div>
+            </div>
           </div>
 
           {/* Input */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+          <div className="chat-input-wrapper">
             <input
               type="text"
+              className="chat-input"
               placeholder="Ask a question..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-              }}
             />
             <button
-              className="primary"
+              className="send-btn"
               onClick={handleSend}
-              disabled={loading}
-              style={{
-                background: loading ? "#ccc" : "linear-gradient(90deg,#ff24ed,#2ffa2f)",
-              }}
+              disabled={loading || !input.trim()}
             >
-              {loading ? "..." : "Send"}
+              <Send className="send-icon" />
+              Send
             </button>
           </div>
         </main>

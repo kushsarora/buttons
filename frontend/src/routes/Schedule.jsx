@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
+import { Sparkles, LogOut, BookOpen, Calendar, MessageSquare, Settings, Bot, X } from "lucide-react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "../styles/Schedule.css";
+import "../styles/Dashboard.css";
 
 export default function Schedule() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -105,7 +107,7 @@ export default function Schedule() {
   const handleEventClick = async (clickInfo) => {
     const origin = clickInfo.event.extendedProps?.origin;
     if (origin !== "custom" && origin !== "ai") {
-      return alert("This event is generated from class data and can’t be deleted here.");
+      return alert("This event is generated from class data and can't be deleted here.");
     }
     if (window.confirm(`Delete event "${clickInfo.event.title}"?`)) {
       const res = await apiFetch(`/api/schedule/${clickInfo.event.id}`, { method: "DELETE" });
@@ -151,10 +153,16 @@ export default function Schedule() {
     <div className="dashboard">
       {/* Navbar */}
       <nav className="dashboard-nav">
-        <div className="logo">BUTTONS</div>
+        <div className="logo">
+          <div className="logo-icon">
+            <Sparkles className="logo-sparkle" />
+          </div>
+          <span>BUTTONS</span>
+        </div>
         <div className="user-info">
-          <span>{user?.name}</span>
+          <span className="user-name">{user?.name}</span>
           <button onClick={handleLogout} className="logout-btn">
+            <LogOut className="btn-icon" />
             Logout
           </button>
         </div>
@@ -169,6 +177,7 @@ export default function Schedule() {
             }`}
             onClick={() => navigate("/dashboard")}
           >
+            <BookOpen className="sidebar-icon" />
             My Classes
           </button>
           <button
@@ -177,6 +186,7 @@ export default function Schedule() {
             }`}
             onClick={() => navigate("/schedule")}
           >
+            <Calendar className="sidebar-icon" />
             Schedule
           </button>
           <button
@@ -185,51 +195,35 @@ export default function Schedule() {
             }`}
             onClick={() => navigate("/chat")}
           >
+            <MessageSquare className="sidebar-icon" />
             Chat with AI
           </button>
         </aside>
 
         {/* Main Panel */}
         <main className="main-panel">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
+          <div className="schedule-header">
+            <div className="welcome-header">
               <h1>📅 Global Schedule</h1>
-              <p className="subtitle">Click a day to add an event or let AI plan study time.</p>
+              <p className="subtitle">Click a day to add an event or let AI plan study time</p>
             </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="schedule-actions">
               <button
-                className="secondary"
+                className="settings-btn"
                 onClick={() => setShowSettings(true)}
-                style={{
-                  background: "#eee",
-                  padding: "10px 16px",
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
               >
-                ⚙️ Settings
+                <Settings className="btn-icon" />
+                Settings
               </button>
 
               <button
-                className="primary"
+                className="ai-btn"
                 onClick={handleAutoSchedule}
                 disabled={loadingAI}
-                style={{
-                  background: loadingAI
-                    ? "#9CC5A1"
-                    : "linear-gradient(90deg, #ff24ed, #2ffa2f)",
-                  border: "none",
-                  padding: "10px 18px",
-                  borderRadius: "10px",
-                  color: "#fff",
-                  fontWeight: "700",
-                  cursor: loadingAI ? "wait" : "pointer",
-                  transition: "all 0.2s ease",
-                }}
               >
-                {loadingAI ? "⏳ Scheduling..." : "🤖 Auto-Schedule with AI"}
+                <Bot className="btn-icon" />
+                {loadingAI ? "Scheduling..." : "Auto-Schedule with AI"}
               </button>
             </div>
           </div>
@@ -265,117 +259,155 @@ export default function Schedule() {
         </main>
       </div>
 
-      {/* Modals */}
+      {/* Add Event Modal */}
       {showModal && (
-        <div className="modal-backdrop">
-          <div className="modal-card">
-            <h2>Add Event</h2>
-            <label>Title:</label>
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-            />
-            <label>Class:</label>
-            <select
-              value={form.class_id}
-              onChange={(e) => setForm({ ...form, class_id: e.target.value })}
-            >
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code || c.title}
-                </option>
-              ))}
-            </select>
-            <label>Type:</label>
-            <select
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
-            >
-              <option value="lecture">Lecture</option>
-              <option value="exam">Exam</option>
-              <option value="assignment">Assignment</option>
-              <option value="study">Study / Work</option>
-              <option value="custom">Custom</option>
-            </select>
-            <label>Start:</label>
-            <input
-              type="datetime-local"
-              value={form.start}
-              onChange={(e) => setForm({ ...form, start: e.target.value })}
-            />
-            <label>End:</label>
-            <input
-              type="datetime-local"
-              value={form.end}
-              onChange={(e) => setForm({ ...form, end: e.target.value })}
-            />
-            <label>Repeat:</label>
-            <select
-              value={form.repeat}
-              onChange={(e) => setForm({ ...form, repeat: e.target.value })}
-            >
-              <option value="none">None</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Biweekly</option>
-            </select>
+        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="schedule-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setShowModal(false)}>×</button>
+            <h2 className="modal-title">Add Event</h2>
+            
+            <div className="modal-grid">
+              <div className="form-field">
+                <label>Event Title</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="e.g., Study Session"
+                />
+              </div>
+              
+              <div className="form-field">
+                <label>Class</label>
+                <select
+                  value={form.class_id}
+                  onChange={(e) => setForm({ ...form, class_id: e.target.value })}
+                >
+                  {classes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code || c.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-field">
+                <label>Event Type</label>
+                <select
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                >
+                  <option value="lecture">Lecture</option>
+                  <option value="exam">Exam</option>
+                  <option value="assignment">Assignment</option>
+                  <option value="study">Study / Work</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              
+              <div className="form-field">
+                <label>Repeat</label>
+                <select
+                  value={form.repeat}
+                  onChange={(e) => setForm({ ...form, repeat: e.target.value })}
+                >
+                  <option value="none">None</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Biweekly</option>
+                </select>
+              </div>
+              
+              <div className="form-field">
+                <label>Start Time</label>
+                <input
+                  type="datetime-local"
+                  value={form.start}
+                  onChange={(e) => setForm({ ...form, start: e.target.value })}
+                />
+              </div>
+              
+              <div className="form-field">
+                <label>End Time</label>
+                <input
+                  type="datetime-local"
+                  value={form.end}
+                  onChange={(e) => setForm({ ...form, end: e.target.value })}
+                />
+              </div>
+            </div>
 
-            <div className="actions">
+            <div className="modal-actions">
               <button className="secondary" onClick={() => setShowModal(false)}>
+                <X className="btn-icon-small" />
                 Cancel
               </button>
               <button className="primary" onClick={handleSave}>
-                Save
+                <Sparkles className="btn-icon-small" />
+                Save Event
               </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Settings Modal */}
       {showSettings && (
-        <div className="modal-backdrop">
-          <div className="modal-card" style={{ width: "450px" }}>
-            <h2>AI Scheduling Settings</h2>
+        <div className="modal-backdrop" onClick={() => setShowSettings(false)}>
+          <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setShowSettings(false)}>×</button>
+            <h2 className="modal-title">AI Scheduling Settings</h2>
 
-            <label>Study Start Hour:</label>
-            <input
-              type="time"
-              value={settings.startHour}
-              onChange={(e) => setSettings({ ...settings, startHour: e.target.value })}
-            />
+            <div className="settings-grid">
+              <div className="form-field">
+                <label>Study Start Hour</label>
+                <input
+                  type="time"
+                  value={settings.startHour}
+                  onChange={(e) => setSettings({ ...settings, startHour: e.target.value })}
+                />
+              </div>
 
-            <label>Study End Hour:</label>
-            <input
-              type="time"
-              value={settings.endHour}
-              onChange={(e) => setSettings({ ...settings, endHour: e.target.value })}
-            />
+              <div className="form-field">
+                <label>Study End Hour</label>
+                <input
+                  type="time"
+                  value={settings.endHour}
+                  onChange={(e) => setSettings({ ...settings, endHour: e.target.value })}
+                />
+              </div>
 
-            <label>Sessions per week:</label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={settings.sessionsPerWeek}
-              onChange={(e) =>
-                setSettings({ ...settings, sessionsPerWeek: parseInt(e.target.value) })
-              }
-            />
+              <div className="form-field">
+                <label>Sessions per Week</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={settings.sessionsPerWeek}
+                  onChange={(e) =>
+                    setSettings({ ...settings, sessionsPerWeek: parseInt(e.target.value) })
+                  }
+                />
+              </div>
 
-            <label>
-              <input
-                type="checkbox"
-                checked={settings.avoidWeekends}
-                onChange={(e) => setSettings({ ...settings, avoidWeekends: e.target.checked })}
-              />
-              Avoid weekends
-            </label>
+              <div className="form-field checkbox-field">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.avoidWeekends}
+                    onChange={(e) => setSettings({ ...settings, avoidWeekends: e.target.checked })}
+                  />
+                  Avoid weekends
+                </label>
+              </div>
+            </div>
 
-            <div className="actions">
+            <div className="modal-actions">
               <button className="secondary" onClick={() => setShowSettings(false)}>
+                <X className="btn-icon-small" />
                 Cancel
               </button>
               <button className="primary" onClick={saveSettings}>
+                <Settings className="btn-icon-small" />
                 Save Settings
               </button>
             </div>
