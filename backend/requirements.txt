@@ -1,9 +1,22 @@
-flask
-flask-cors
-dotenv
-sqlalchemy
+# Core framework
+Flask
+Flask-Cors
+gunicorn
+
+# Environment and configuration
+python-dotenv
+
+# Database and ORM
+SQLAlchemy
+
+# AI + PDF parsing
+openai
 pdfminer.six
+
+# Google authentication
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
-openai
+
+# Utilities
+requests
