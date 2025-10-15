@@ -11,10 +11,11 @@ load_dotenv()
 # --- Initialize Flask app ---
 app = Flask(__name__)
 
-# ✅ Enable CORS for frontend dev
-CORS(app, supports_credentials=True, origins=[
+CORS(app, origins=[
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "https://buttonsai.vercel.app",
+    "https://buttonsai.org",
+    "https://www.buttonsai.org"
 ])
 
 # --- Google Login Configuration ---
