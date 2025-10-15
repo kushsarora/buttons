@@ -80,29 +80,36 @@ export default function Schedule() {
   };
 
   const handleSave = async () => {
-    if (!form.title) return alert("Please enter a title.");
-    if (!form.class_id) return alert("Please choose a class.");
+  if (!form.title) return alert("Please enter a title.");
+  if (!form.class_id) return alert("Please choose a class.");
 
-    const res = await apiFetch("/api/schedule/add", {
-      method: "POST",
-      body: form,
+  const res = await apiFetch("/api/schedule/add", {
+    method: "POST",
+    body: form,
+  });
+
+  if (res.success) {
+    // ✅ Immediately reload all events from backend
+    await loadEvents();
+
+    // Reset modal + form
+    setShowModal(false);
+    setForm({
+      title: "",
+      start: "",
+      end: "",
+      repeat: "none",
+      type: "study",
+      class_id: "",
     });
 
-    if (res.success) {
-      await loadEvents();
-      setShowModal(false);
-      setForm({
-        title: "",
-        start: "",
-        end: "",
-        repeat: "none",
-        type: "study",
-        class_id: "",
-      });
-    } else {
-      alert(res.error || "Failed to add event");
-    }
-  };
+    // ✅ Double-refresh safety to catch delayed writes
+    setTimeout(loadEvents, 300);
+  } else {
+    alert(res.error || "Failed to add event");
+  }
+};
+
 
   const handleEventClick = async (clickInfo) => {
     const origin = clickInfo.event.extendedProps?.origin;
@@ -131,23 +138,25 @@ export default function Schedule() {
   };
 
   const handleAutoSchedule = async () => {
-    if (loadingAI) return;
-    setLoadingAI(true);
-    try {
-      const payload = { settings };
-      const res = await apiFetch("/api/schedule/auto", { method: "POST", body: payload });
-      if (res.events || res.success) {
-        setEvents(res.events || []);
-        alert(`✅ AI scheduled ${res.events?.length || res.added?.length || 0} new sessions!`);
-      } else {
-        alert(res.message || "AI scheduling failed.");
-      }
-    } catch (err) {
-      alert("Error running AI scheduling: " + err.message);
-    } finally {
-      setLoadingAI(false);
+  if (loadingAI) return;
+  setLoadingAI(true);
+  try {
+    const payload = { settings };
+    const res = await apiFetch("/api/schedule/auto", { method: "POST", body: payload });
+
+    if (res.events || res.success) {
+      setEvents(res.events || []);
+      alert(`✅ AI scheduled ${res.events?.length || res.added?.length || 0} new sessions!`);
+      await loadEvents(); // ✅ always reloads from backend for safety
+    } else {
+      alert(res.message || "AI scheduling failed.");
     }
-  };
+  } catch (err) {
+    alert("Error running AI scheduling: " + err.message);
+  } finally {
+    setLoadingAI(false);
+  }
+};
 
   return (
     <div className="dashboard">

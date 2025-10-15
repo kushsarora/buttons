@@ -44,11 +44,11 @@ def normalize_date(date_str, default_year):
     """Accepts 'YYYY-MM-DD', 'MM/DD', or ISO; returns same (ISO preserved)."""
     try:
         s = (date_str or "").strip()
-        if "T" in s:     # already datetime
+        if "T" in s:
             return s
-        if "-" in s and len(s) >= 8:  # YYYY-MM-DD
+        if "-" in s and len(s) >= 8:
             return s
-        if "/" in s:  # MM/DD
+        if "/" in s:
             m, d = s.split("/")
             return f"{default_year}-{int(m):02d}-{int(d):02d}"
     except Exception:
@@ -104,9 +104,10 @@ TYPE_DOT_COLORS = {
     "custom": "#49A078",
 }
 
-# Build a full event list (generated + custom/AI)
+# ----------------- Internal -----------------
+
 def _build_events_for_user(user, db):
-    # always refresh to avoid stale JSON relationships
+    """Build full schedule view for a user (generated + custom/AI)."""
     db.refresh(user)
     for c in user.classes:
         db.refresh(c)
@@ -121,7 +122,7 @@ def _build_events_for_user(user, db):
         term_start, term_end = term_dates(c.term)
         year = term_start.year if term_start else datetime.now().year
 
-        # ---- Assignments (generated single-day items) ----
+        # ---- Assignments ----
         for a in (c.assignments or []):
             date_raw = a.get("due_date") or a.get("start")
             if not date_raw:
@@ -139,7 +140,7 @@ def _build_events_for_user(user, db):
                 "textColor": "#ffffff",
             })
 
-        # ---- Exams (generated single-day items) ----
+        # ---- Exams ----
         for e in (c.exams or []):
             date_raw = e.get("date") or e.get("start")
             if not date_raw:
@@ -157,7 +158,7 @@ def _build_events_for_user(user, db):
                 "textColor": "#ffffff",
             })
 
-        # ---- Meetings (Lectures/Discussions weekly) ----
+        # ---- Meetings ----
         for m in (c.meetings or []):
             day_name = normalize_day(m.get("day"))
             if not day_name or not m.get("start_time") or not term_start:
@@ -187,7 +188,7 @@ def _build_events_for_user(user, db):
 
         # ---- Custom + AI (persisted) ----
         for ce in (c.custom_events or []):
-            ce = dict(ce)  # copy to avoid mutating in-place
+            ce = dict(ce)
             ce["color"] = class_color
             ce["textColor"] = "#ffffff"
             ce["dotColor"] = TYPE_DOT_COLORS.get(ce.get("type", "custom"), TYPE_DOT_COLORS["custom"])
@@ -251,7 +252,7 @@ def add_event():
             cls.custom_events = []
         cls.custom_events.append(new_event)
 
-        # handle repeats (weekly/biweekly) for ~8 occurrences
+        # handle repeats (weekly/biweekly)
         extra = []
         if new_event["repeat"] in ["weekly", "biweekly"]:
             interval = 7 if new_event["repeat"] == "weekly" else 14
@@ -266,8 +267,11 @@ def add_event():
 
         db.commit()
         db.refresh(cls)
+        db.refresh(user)
 
-        return jsonify({"success": True, "events": [new_event] + extra})
+        events = _build_events_for_user(user, db)
+
+        return jsonify({"success": True, "added": [new_event] + extra, "events": events})
     finally:
         db.close()
 
@@ -301,7 +305,7 @@ def delete_event(event_id):
 def auto_schedule():
     """
     Ask AI to generate study/work sessions with user preferences.
-    Immediately returns a fresh, complete event list (generated + custom/AI).
+    Returns a fresh, complete event list including AI + user-added sessions.
     """
     db = SessionLocal()
     try:
@@ -312,15 +316,21 @@ def auto_schedule():
         payload = request.json or {}
         settings = payload.get("settings", {})
 
-        # Use the SAME DB session so writes are visible here
+        # Run AI scheduler with same DB session
         result = ai_schedule_for_user(user, settings=settings, db=db)
 
         if result.get("success"):
-            # Clear caches and rebuild events fresh
             db.expire_all()
-            user = get_current_user(db)
+            db.refresh(user)
+
+            # Rebuild full schedule with all updates
             events = _build_events_for_user(user, db)
-            return jsonify({"success": True, "events": events, "added": result.get("added", [])})
+
+            return jsonify({
+                "success": True,
+                "added": result.get("added", []),
+                "events": events
+            })
         else:
             return jsonify(result)
     finally:
