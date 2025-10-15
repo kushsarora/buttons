@@ -26,6 +26,7 @@ export default function Schedule() {
   const [loadingAI, setLoadingAI] = useState(false);
   const navigate = useNavigate();
   const calendarRef = useRef();
+  const [calendarVersion, setCalendarVersion] = useState(0);
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem("aiSettings");
@@ -89,26 +90,23 @@ export default function Schedule() {
   });
 
   if (res.success) {
-    // ✅ Immediately reload all events from backend
-    await loadEvents();
+    if (res.events) setEvents(res.events);   
+    await loadEvents();                     
+    setCalendarVersion(v => v + 1);        
 
-    // Reset modal + form
     setShowModal(false);
-    setForm({
-      title: "",
-      start: "",
-      end: "",
-      repeat: "none",
-      type: "study",
-      class_id: "",
-    });
+    setForm({ title: "", start: "", end: "", repeat: "none", type: "study", class_id: "" });
 
-    // ✅ Double-refresh safety to catch delayed writes
-    setTimeout(loadEvents, 300);
+    // extra safety for eventual consistency on some hosts
+    setTimeout(async () => { 
+      await loadEvents();
+      setCalendarVersion(v => v + 1);
+    }, 250);
   } else {
     alert(res.error || "Failed to add event");
   }
 };
+
 
 
   const handleEventClick = async (clickInfo) => {
@@ -145,9 +143,10 @@ export default function Schedule() {
     const res = await apiFetch("/api/schedule/auto", { method: "POST", body: payload });
 
     if (res.events || res.success) {
-      setEvents(res.events || []);
+      if (res.events) setEvents(res.events);     
+      await loadEvents();                        
+      setCalendarVersion(v => v + 1);            
       alert(`✅ AI scheduled ${res.events?.length || res.added?.length || 0} new sessions!`);
-      await loadEvents(); // ✅ always reloads from backend for safety
     } else {
       alert(res.message || "AI scheduling failed.");
     }
@@ -248,6 +247,7 @@ export default function Schedule() {
 
           <div className="calendar-container">
             <FullCalendar
+              key={calendarVersion}   
               ref={calendarRef}
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
